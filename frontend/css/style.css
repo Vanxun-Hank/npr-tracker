@@ -1,0 +1,653 @@
+/*
+ * NPR Transcript Tracker — Styles
+ * ================================
+ * Mobile-first responsive design.
+ *
+ * Key concepts you'll learn:
+ * - CSS variables (custom properties) for consistent colors
+ * - Flexbox for layout
+ * - Fixed positioning for player bar and bottom nav
+ * - Transitions for smooth animations
+ * - Media queries (responsive design)
+ */
+
+/* ─── CSS Variables ─────────────────────────────────────
+   Define colors once, use everywhere. If you want to change
+   the color scheme, you only need to change it here.         */
+
+:root {
+    --color-primary: #1a1a2e;       /* Dark blue — header, nav */
+    --color-accent: #e94560;         /* Red — buttons, highlights */
+    --color-accent-light: #ff6b81;   /* Lighter red — hover states */
+    --color-bg: #f5f5f5;             /* Light gray — page background */
+    --color-card: #ffffff;           /* White — cards, content areas */
+    --color-text: #333333;           /* Dark gray — main text */
+    --color-text-light: #888888;     /* Light gray — secondary text */
+    --color-highlight: #fff3cd;      /* Yellow — active sentence */
+    --color-highlight-border: #ffc107;
+    --font-main: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --nav-height: 60px;
+    --header-height: 50px;
+}
+
+/* ─── Reset & Base ──────────────────────────────────────
+   Remove default browser styles for consistency              */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;  /* Makes width/height include padding */
+}
+
+html {
+    scroll-behavior: smooth;  /* Smooth scrolling when jumping to elements */
+}
+
+body {
+    font-family: var(--font-main);
+    background: var(--color-bg);
+    color: var(--color-text);
+    /* Add padding so content isn't hidden behind fixed header/nav */
+    padding-top: var(--header-height);
+    padding-bottom: var(--nav-height);
+    min-height: 100vh;
+    -webkit-text-size-adjust: 100%;  /* Prevent font size adjustment on rotation */
+}
+
+/* ─── Header ────────────────────────────────────────── */
+
+.app-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--header-height);
+    background: var(--color-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;   /* z-index controls stacking order — higher = on top */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.app-header h1 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* ─── Views ───────────────────────────────────────────
+   Only the "active" view is visible. JS toggles this class. */
+
+.view {
+    display: none;          /* Hidden by default */
+    padding: 16px;
+    max-width: 480px;       /* Phone-width constraint */
+    margin: 0 auto;         /* Center on larger screens */
+}
+
+.view.active {
+    display: block;         /* Show when active */
+}
+
+/* ─── Show Selector ─────────────────────────────────── */
+
+.show-selector {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 12px;
+    background: var(--color-card);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.show-selector label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--color-text-light);
+}
+
+.show-selector select {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    background: white;
+    color: var(--color-text);
+}
+
+/* ─── Show Picker ──────────────────────────────────── */
+
+/* Currently selected show display — tap to change
+   This is a <button> for keyboard accessibility, so we reset
+   the default button styles to look like a plain row */
+.selected-show {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    cursor: pointer;
+    padding: 4px 0;
+    background: none;
+    border: none;
+    font-family: var(--font-main);
+    text-align: left;
+}
+
+#selected-show-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.change-btn {
+    font-size: 0.8rem;
+    color: var(--color-accent);
+    font-weight: 500;
+}
+
+/* Search input for filtering podcasts */
+.show-search {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    background: white;
+    color: var(--color-text);
+    outline: none;
+    margin-top: 8px;
+}
+
+.show-search:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 2px rgba(233, 69, 96, 0.1);
+}
+
+/* Episode title search — filters episodes within the current show */
+.episode-search {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    background: white;
+    color: var(--color-text);
+    outline: none;
+    margin-bottom: 12px;
+}
+
+.episode-search:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 2px rgba(233, 69, 96, 0.1);
+}
+
+/* Scrollable container for podcast cards */
+.show-list {
+    max-height: 65vh;
+    overflow-y: auto;
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* Category group header */
+.show-category-header {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-text-light);
+    padding: 12px 12px 4px;
+    position: sticky;
+    top: 0;
+    background: var(--color-bg);
+    z-index: 1;
+}
+
+/* Individual podcast card in the list */
+.show-card {
+    background: var(--color-card);
+    border-radius: 6px;
+    padding: 10px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background-color 0.15s;
+}
+
+.show-card:hover,
+.show-card:active {
+    background-color: #f0f0f0;
+}
+
+.show-card-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+/* Category pill/badge on each show card */
+.show-card-category {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    flex-shrink: 0;
+}
+
+/* Category colors — each category gets a distinct color */
+.show-card-category[data-category="News"] { background: #e3f2fd; color: #1565c0; }
+.show-card-category[data-category="Politics"] { background: #fce4ec; color: #c62828; }
+.show-card-category[data-category="Culture"] { background: #f3e5f5; color: #7b1fa2; }
+.show-card-category[data-category="Business"] { background: #e8f5e9; color: #2e7d32; }
+.show-card-category[data-category="Science"] { background: #e0f7fa; color: #00838f; }
+.show-card-category[data-category="Technology"] { background: #e0f7fa; color: #00838f; }
+.show-card-category[data-category="History"] { background: #fff3e0; color: #e65100; }
+.show-card-category[data-category="Comedy"] { background: #fff9c4; color: #f57f17; }
+.show-card-category[data-category="Music"] { background: #ede7f6; color: #4527a0; }
+.show-card-category[data-category="Society"] { background: #efebe9; color: #4e342e; }
+.show-card-category[data-category="Health"] { background: #e8f5e9; color: #2e7d32; }
+.show-card-category[data-category="Self-Improvement"] { background: #e8f5e9; color: #2e7d32; }
+.show-card-category[data-category="Books"] { background: #fce4ec; color: #880e4f; }
+.show-card-category[data-category="True Crime"] { background: #fbe9e7; color: #bf360c; }
+.show-card-category[data-category="Education"] { background: #e3f2fd; color: #1565c0; }
+.show-card-category[data-category="Family"] { background: #fff9c4; color: #f57f17; }
+
+/* ─── Episode List ──────────────────────────────────── */
+
+.episode-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.episode-card {
+    background: var(--color-card);
+    border-radius: 8px;
+    padding: 14px 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    /* Transition = smooth animation when properties change */
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    border-left: 3px solid transparent;
+}
+
+.episode-card:hover,
+.episode-card:active {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+    border-left-color: var(--color-accent);
+}
+
+.episode-card .episode-card-title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--color-text);
+}
+
+.episode-card .episode-card-date {
+    font-size: 0.8rem;
+    color: var(--color-text-light);
+    margin-top: 4px;
+}
+
+/* ─── Player View ───────────────────────────────────── */
+
+.btn-back {
+    background: none;
+    border: none;
+    color: var(--color-accent);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 8px 0;
+    font-weight: 500;
+}
+
+.episode-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 8px 0 12px;
+    line-height: 1.3;
+}
+
+/* ─── Audio Player Controls ─────────────────────────── */
+
+.player-controls {
+    background: var(--color-primary);
+    color: white;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    position: sticky;        /* Stays visible when scrolling */
+    top: var(--header-height);
+    z-index: 50;
+}
+
+.player-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-play {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: var(--color-accent);
+    color: white;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s;
+}
+
+.btn-play:hover {
+    background: var(--color-accent-light);
+}
+
+/* Seek bar — custom styled range input */
+.seek-bar {
+    flex: 1;
+    height: 4px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    outline: none;
+}
+
+.seek-bar::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    cursor: pointer;
+}
+
+#time-current,
+#time-duration {
+    font-size: 0.75rem;
+    min-width: 35px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;  /* Fixed-width numbers */
+}
+
+.player-speed {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    font-size: 0.8rem;
+}
+
+.player-speed select {
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 0.8rem;
+}
+
+/* ─── Resume Prompt ─────────────────────────────────── */
+
+.resume-prompt {
+    background: var(--color-highlight);
+    border: 1px solid var(--color-highlight-border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.resume-prompt p {
+    flex: 1;
+    font-size: 0.9rem;
+    min-width: 150px;
+}
+
+.resume-prompt button {
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: none;
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+#btn-resume {
+    background: var(--color-accent);
+    color: white;
+}
+
+#btn-start-over {
+    background: #ddd;
+    color: var(--color-text);
+}
+
+/* ─── Transcript ────────────────────────────────────── */
+
+.transcript-container {
+    padding-bottom: 40px;  /* Extra space at bottom for scrolling */
+}
+
+.transcript-sentence {
+    padding: 8px 12px;
+    margin: 2px 0;
+    border-radius: 6px;
+    line-height: 1.7;       /* Good line height for readability */
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;  /* Smooth highlight transition */
+    border-left: 3px solid transparent;
+}
+
+/* The currently spoken sentence */
+.transcript-sentence.active {
+    background-color: var(--color-highlight);
+    border-left-color: var(--color-highlight-border);
+}
+
+.transcript-sentence:hover {
+    background-color: #f0f0f0;
+}
+
+.transcript-sentence.active:hover {
+    background-color: var(--color-highlight);
+}
+
+/* Individual words — tappable for vocab saving */
+.transcript-word {
+    cursor: pointer;
+    border-radius: 2px;
+    transition: background-color 0.15s;
+}
+
+.transcript-word:hover {
+    background-color: rgba(233, 69, 96, 0.15);
+}
+
+/* ─── Word Save Popup ───────────────────────────────── */
+
+.word-popup {
+    position: fixed;
+    bottom: calc(var(--nav-height) + 16px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-primary);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 200;
+    max-width: 90vw;
+}
+
+.word-popup p {
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.word-popup button {
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: none;
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+#btn-save-word {
+    background: var(--color-accent);
+    color: white;
+}
+
+#btn-cancel-word {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+/* ─── Vocabulary View ───────────────────────────────── */
+
+.view-title {
+    font-size: 1.2rem;
+    margin-bottom: 16px;
+}
+
+.vocab-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.vocab-card {
+    background: var(--color-card);
+    border-radius: 8px;
+    padding: 14px 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    position: relative;
+}
+
+.vocab-card .vocab-word {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-accent);
+    margin-bottom: 4px;
+}
+
+.vocab-card .vocab-sentence {
+    font-size: 0.85rem;
+    color: var(--color-text-light);
+    line-height: 1.4;
+    font-style: italic;
+}
+
+.vocab-card .vocab-episode {
+    font-size: 0.75rem;
+    color: var(--color-text-light);
+    margin-top: 6px;
+}
+
+.vocab-card .vocab-delete {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #ccc;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.vocab-card .vocab-delete:hover {
+    color: var(--color-accent);
+}
+
+/* ─── Bottom Navigation ─────────────────────────────── */
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--nav-height);
+    background: var(--color-card);
+    display: flex;
+    border-top: 1px solid #e0e0e0;
+    z-index: 100;
+}
+
+.nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: none;
+    color: var(--color-text-light);
+    cursor: pointer;
+    gap: 2px;
+    transition: color 0.2s;
+}
+
+.nav-btn.active {
+    color: var(--color-accent);
+}
+
+.nav-icon {
+    font-size: 1.3rem;
+}
+
+.nav-label {
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+/* ─── Utility Classes ───────────────────────────────── */
+
+.loading {
+    text-align: center;
+    color: var(--color-text-light);
+    padding: 40px 16px;
+    font-size: 0.95rem;
+}
+
+.empty-state {
+    text-align: center;
+    color: var(--color-text-light);
+    padding: 60px 16px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.error-msg {
+    background: #fee;
+    color: #c00;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin: 8px 0;
+}

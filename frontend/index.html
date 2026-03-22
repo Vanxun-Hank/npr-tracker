@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!--
+        This is the main HTML file — the "skeleton" of our app.
+        It defines the structure: what elements exist on the page.
+        CSS makes it look good, JS makes it interactive.
+    -->
+    <meta charset="UTF-8">
+
+    <!-- This meta tag is CRITICAL for mobile — without it, the page
+         would appear zoomed out on phones -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- PWA meta tags — these help the app feel native on phones -->
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <title>NPR Transcript Tracker</title>
+
+    <!-- Link to our PWA manifest (tells the phone how to install the app) -->
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- Our stylesheet -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <!-- ─── Header ──────────────────────────────────────── -->
+    <header class="app-header">
+        <h1>NPR Tracker</h1>
+    </header>
+
+    <!-- ─── View 1: Episode List ────────────────────────── -->
+    <main id="view-episodes" class="view active">
+        <!-- Show picker — search and browse all NPR podcasts
+             The search input filters the show list in real time.
+             Shows are grouped by category (News, Culture, Science, etc.) -->
+        <div class="show-selector">
+            <button id="selected-show" class="selected-show" aria-expanded="false">
+                <span id="selected-show-name">Up First</span>
+                <span class="change-btn">Change</span>
+            </button>
+            <input type="text" id="show-search" class="show-search" placeholder="Search podcasts..." style="display: none;" autocomplete="off">
+        </div>
+        <div id="show-list" class="show-list" style="display: none;">
+            <!-- Populated by JavaScript from /api/shows -->
+        </div>
+
+        <!-- Episode title search — filters episodes by title within the current show
+             Uses client-side filtering on the already-loaded episode list -->
+        <input type="text" id="episode-search" class="episode-search"
+               placeholder="Search episode titles..." autocomplete="off">
+
+        <!-- Episode list container — populated by JavaScript -->
+        <div id="episode-list" class="episode-list">
+            <p class="loading">Loading episodes...</p>
+        </div>
+    </main>
+
+    <!-- ─── View 2: Player + Transcript ─────────────────── -->
+    <main id="view-player" class="view">
+        <!-- Back button to return to episode list -->
+        <button id="btn-back" class="btn-back">&larr; Back</button>
+
+        <!-- Episode title -->
+        <h2 id="episode-title" class="episode-title"></h2>
+
+        <!-- Audio player controls (fixed at top) -->
+        <div id="player-controls" class="player-controls">
+            <div class="player-buttons">
+                <button id="btn-play" class="btn-play">&#9654;</button>
+                <span id="time-current">0:00</span>
+                <input type="range" id="seek-bar" class="seek-bar" min="0" max="100" value="0" step="0.1">
+                <span id="time-duration">0:00</span>
+            </div>
+            <div class="player-speed">
+                <label for="speed-select">Speed:</label>
+                <select id="speed-select">
+                    <option value="0.75">0.75x</option>
+                    <option value="1" selected>1x</option>
+                    <option value="1.25">1.25x</option>
+                    <option value="1.5">1.5x</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Resume bookmark prompt (hidden by default) -->
+        <div id="resume-prompt" class="resume-prompt" style="display: none;">
+            <p>You were last at <span id="resume-time"></span></p>
+            <button id="btn-resume">Resume</button>
+            <button id="btn-start-over">Start Over</button>
+        </div>
+
+        <!-- Transcript container — populated by JavaScript -->
+        <div id="transcript-container" class="transcript-container">
+            <p class="loading">Loading transcript... (this may take a few minutes on first load)</p>
+        </div>
+    </main>
+
+    <!-- ─── View 3: Vocabulary ──────────────────────────── -->
+    <main id="view-vocab" class="view">
+        <h2 class="view-title">Saved Words</h2>
+        <div id="vocab-list" class="vocab-list">
+            <p class="empty-state">No saved words yet. Tap words in transcripts to save them!</p>
+        </div>
+    </main>
+
+    <!-- ─── Word Save Popup (hidden, shown on word tap) ── -->
+    <div id="word-popup" class="word-popup" style="display: none;">
+        <p id="word-popup-text"></p>
+        <button id="btn-save-word">Save</button>
+        <button id="btn-cancel-word">Cancel</button>
+    </div>
+
+    <!-- ─── Bottom Navigation Bar ───────────────────────── -->
+    <nav class="bottom-nav">
+        <button class="nav-btn active" data-view="view-episodes">
+            <span class="nav-icon">&#9776;</span>
+            <span class="nav-label">Episodes</span>
+        </button>
+        <button class="nav-btn" data-view="view-vocab">
+            <span class="nav-icon">&#9733;</span>
+            <span class="nav-label">Vocabulary</span>
+        </button>
+    </nav>
+
+    <!-- ─── JavaScript Modules ──────────────────────────── -->
+    <!-- Order matters! Dependencies must load before dependents -->
+    <script src="/js/bookmark.js"></script>
+    <script src="/js/player.js"></script>
+    <script src="/js/transcript.js"></script>
+    <script src="/js/vocab.js"></script>
+    <script src="/js/app.js"></script>
+
+    <!-- Register the service worker for PWA functionality -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(() => console.log('Service Worker registered'))
+                .catch(err => console.log('SW registration failed:', err));
+        }
+    </script>
+</body>
+</html>

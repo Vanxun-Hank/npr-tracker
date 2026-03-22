@@ -1,0 +1,11 @@
+{
+    "name": "NPR Transcript Tracker",
+    "short_name": "NPR Tracker",
+    "description": "Track your position in NPR podcast transcripts with auto-highlighting",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#1a1a2e",
+    "theme_color": "#1a1a2e",
+    "orientation": "portrait",
+    "icons": []
+}
