@@ -506,6 +506,11 @@ window.NPR = window.NPR || {};
         var titleEl = document.getElementById('episode-title');
         titleEl.textContent = episode.title || 'Loading...';
 
+        // Load audio immediately via proxy (don't wait for transcript)
+        if (episode.audio_url) {
+            window.NPR.Player.loadTrack('/api/audio-proxy?url=' + encodeURIComponent(episode.audio_url));
+        }
+
         // Tell vocab module which episode we're on
         window.NPR.Vocab.setEpisodeName(episode.title);
 
@@ -552,11 +557,9 @@ window.NPR = window.NPR || {};
                 // Load transcript into the view
                 window.NPR.Transcript.loadTranscript(data);
 
-                // Load audio — HTML5 <audio> can play cross-origin URLs directly
-                // (CORS only blocks programmatic access like fetch, not media playback)
-                // We try direct URL first; fall back to our proxy if needed
-                if (data.audio_url) {
-                    window.NPR.Player.loadTrack(data.audio_url);
+                // Load audio via proxy if not already loaded
+                if (data.audio_url && !episode.audio_url) {
+                    window.NPR.Player.loadTrack('/api/audio-proxy?url=' + encodeURIComponent(data.audio_url));
                 }
 
                 // Check for existing bookmark
